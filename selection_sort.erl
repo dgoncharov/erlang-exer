@@ -18,11 +18,5 @@ min_elem_first([H1,H2|T], R) ->
 	case H1 < H2 of
 	true -> min_elem_first([H1|T],[H2|R]);
 	false -> min_elem_first([H2|T], [H1|R])
-	end;
-
-min_elem_first([H1|H2], R) ->
-	case H1 < H2 of
-	true -> [H1,H2|R];
-	false -> [H2, H1|R]
 	end.
 
