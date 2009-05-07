@@ -5,14 +5,15 @@ conc(File) ->
 	{ok, S} = file:open(File, read),
 	read([], 1, S).
 
-read(L, N, S) ->
+read(Result, Line, S) ->
 	R = io:get_line(S, ''),
 	if eof =:= R ->
-		L;
+		Result;
 	true ->
-		R1 = string:tokens(R, ",. ;\n"),
-		R2 = process_line(R1, L, N),
-		read(R2, N + 1, S)
+		R1 = string:tokens(R, "<>\|/+-=~^!@#$%&*()[]{}?:,. ;\n\t\v\"\'"),
+		R2 = process_line(R1, Result, Line),
+		R3 = read(R2, Line + 1, S),
+		R3
 	end.
 
 
