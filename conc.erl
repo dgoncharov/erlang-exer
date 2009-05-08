@@ -1,5 +1,11 @@
 -module(conc).
+-export([main/1]).
 -export([conc/1]).
+
+main([A]) ->
+	R = conc(A),
+	io:format("~p~n", [R]),
+	init:stop().
 
 conc(File) ->
 	{ok, S} = file:open(File, read),
