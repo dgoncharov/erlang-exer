@@ -9,18 +9,17 @@ main([A]) ->
 
 conc(File) ->
 	{ok, S} = file:open(File, read),
-	read([], 1, S).
+	process_line(io:get_line(S, ''), [], 1, S).
 
-read(Result, Line, S) ->
-	R = io:get_line(S, ''),
-	if eof =:= R ->
-		Result;
-	true ->
-		R1 = string:tokens(R, "<>\|/+-=~^!@#$%&*()[]{}?:,. ;\n\t\v\"\'"),
+
+process_line(eof, Result, _, _) ->
+	Result;
+
+process_line(String, Result, Line, S) ->
+		R1 = string:tokens(String, "<>\|/+-=~^!@#$%&*()[]{}?:,. ;\n\t\v\"\'"),
 		R2 = process_words(R1, Result, Line),
-		R3 = read(R2, Line + 1, S),
-		R3
-	end.
+		R3 = process_line(io:get_line(S, ''), R2, Line + 1, S),
+		R3.
 
 process_words([H|T], Result, Line) ->
 	R = lists:keyfind({H, Line}, 1, Result),
