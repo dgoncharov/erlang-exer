@@ -4,7 +4,8 @@
 
 main([A]) ->
 	R = conc(A),
-	print(R).
+	R2 = lists:keysort(1, R),
+	print(R2).
 
 conc(File) ->
 	{ok, FD} = file:open(File, read),
