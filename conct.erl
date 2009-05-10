@@ -1,8 +1,7 @@
 #!/usr/bin/env escript
 
 main([A]) ->
-	R = conc:conc(A),
-	io:format("~p~n", [R]);
+	conc:main([A]);
 
 main([]) ->
 	io:format("usage: conct file~n").
