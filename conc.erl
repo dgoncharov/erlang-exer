@@ -38,9 +38,10 @@ process_word(Tuple, [H|T], Result, Linenum) ->
 	process_words(T, R1, Linenum).
 
 print([{{W, _Linenum}, _N}|_T]=Result) ->
-	io:format("~p~n", [W]),
+	io:format("~s~n", [W]),
 	Stats = [{Linenum2, N2} || {{W2, Linenum2}, N2} <- Result, W2 =:= W],
-	io:format("    ~p~n", [Stats]),
+	lists:foreach(fun({Linenum, N}) -> io:format("    ~B: ~B~n", [Linenum, N]) end, Stats),
+	io:format("~n"),
 	Other = [{{W2, Linenum2}, N2} || {{W2, Linenum2}, N2} <- Result, (W2 =/= W)],
 	print(Other);
 
