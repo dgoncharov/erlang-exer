@@ -10,6 +10,6 @@ main(_) ->
 
 fade(Infile, Outfile) ->
 	{ok, D} = file:read_file(Infile),
-	P = re:replace(D, "\033\\[(1;)?\\d{0,2}m", "", [{return, list}, global]),
+	P = re:replace(D, "\033\\[(\\d{1,2};)?\\d{0,2}m", "", [{return, list}, global]),
 	file:write_file(Outfile, P).
 
