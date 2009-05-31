@@ -17,25 +17,23 @@ process_line(eof, Result, _, _) ->
 process_line(String, Result, Linenum, FD) ->
 	R1 = string:tokens(String, "<>\|/+-=~^!@#$%&*()[]{}?:,. ;\n\t\v\"\'"),
 	R2 = process_words(R1, Result, Linenum),
-	R3 = process_line(io:get_line(FD, ''), R2, Linenum + 1, FD),
-	R3.
+	process_line(io:get_line(FD, ''), R2, Linenum + 1, FD).
 
-process_words([H|_T]=L, Result, Linenum) ->
+process_words([H|T]=L, Result, Linenum) ->
 	R = lists:keyfind({H, Linenum}, 1, Result),
-	process_word(R, L, Result, Linenum);
+	R1 = process_word(R, L, Result, Linenum),
+	process_words(T, R1, Linenum);
 
 process_words([], Result, _) ->
 	Result.
 
-process_word(false, [H|T], Result, Linenum) ->
-	R = lists:append(Result, [{{H, Linenum}, 1}]),
-	process_words(T, R, Linenum);
+process_word(false, [H|_T], Result, Linenum) ->
+	lists:append(Result, [{{H, Linenum}, 1}]);
 
-process_word(Tuple, [H|T], Result, Linenum) ->
+process_word(Tuple, [H|_T], Result, Linenum) ->
         R = [{{W, Linenum2}, N} || {{W, Linenum2}, N} <- Result, (W =/= H) or (Linenum2 =/= Linenum)],
 	{{W, _Linenum}, N} = Tuple, %TODO: read the line and assert it is equal to Linenum
-	R1 = lists:append(R, [{{W, Linenum}, N + 1}]),
-	process_words(T, R1, Linenum).
+	lists:append(R, [{{W, Linenum}, N + 1}]).
 
 print([{{W, _Linenum}, _N}|_T]=Result) ->
 	io:format("~s~n", [W]),
