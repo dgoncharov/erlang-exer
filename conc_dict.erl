@@ -1,4 +1,4 @@
--module(conc).
+-module(conc_dict).
 -export([main/1]).
 -export([conc/1]).
 
