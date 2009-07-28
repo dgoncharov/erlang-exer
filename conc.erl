@@ -4,15 +4,12 @@
 
 main([A]) ->
 	R = conc(A),
-	%%TODO: print the dict somehow w/o converting to a list
-	L = dict:to_list(R),
-	R2 = lists:keysort(1, L),
+	R2 = lists:keysort(1, R),
 	print(R2).
 
 conc(File) ->
 	{ok, FD} = file:open(File, read),
-	Result = dict:new(),
-	process_line(io:get_line(FD, ''), Result, 1, FD).
+	process_line(io:get_line(FD, ''), [], 1, FD).
 
 process_line(eof, Result, _, _) ->
 	Result;
@@ -22,18 +19,21 @@ process_line(String, Result, Linenum, FD) ->
 	R2 = process_words(R1, Result, Linenum),
 	process_line(io:get_line(FD, ''), R2, Linenum + 1, FD).
 
-%% {Word, Linenum} -> NOccurences
-process_words([W|T], Result, Linenum) ->
-	case dict:find({W, Linenum}, Result) of
-	{ok, N} ->
-		R = dict:store({W, Linenum}, N+1, Result);
-	error ->
-		R = dict:store({W, Linenum}, 1, Result)
-	end,
-	process_words(T, R, Linenum);
+process_words([H|T]=L, Result, Linenum) ->
+	R = lists:keyfind({H, Linenum}, 1, Result),
+	R1 = process_word(R, L, Result, Linenum),
+	process_words(T, R1, Linenum);
 
 process_words([], Result, _) ->
 	Result.
+
+process_word(false, [H|_T], Result, Linenum) ->
+	lists:append(Result, [{{H, Linenum}, 1}]);
+
+process_word(Tuple, [H|_T], Result, Linenum) ->
+        R = [{{W, Linenum2}, N} || {{W, Linenum2}, N} <- Result, (W =/= H) or (Linenum2 =/= Linenum)],
+	{{W, _Linenum}, N} = Tuple, %TODO: read the line and assert it is equal to Linenum
+	lists:append(R, [{{W, Linenum}, N + 1}]).
 
 print([{{W, _Linenum}, _N}|_T]=Result) ->
 	io:format("~s~n", [W]),
@@ -45,5 +45,4 @@ print([{{W, _Linenum}, _N}|_T]=Result) ->
 
 print([]) ->
 	io:format("~n").
-
 
